@@ -77,10 +77,12 @@ pip install django-logui
     Only `is_staff` have access.
     ```python
     from django.urls import path, include
-  
+    # Not use django.conf.settings
+    from tests.project.project.settings import LOGUI_URL_PREFIX
+
     urlpatterns = [
-        #...
-        path('', include('logui.routes.views')),
+        ...
+        path(LOGUI_URL_PREFIX, include('logui.routes.views')),
     ]
     ```
 * ### Open https://localhost:8000/logui/
