@@ -3,8 +3,6 @@ from __future__ import annotations
 import logging
 import os
 
-from django.conf import settings
-
 
 class Logger:
     def __init__(
@@ -25,8 +23,8 @@ class Logger:
 class LoggingBuilder:
     def __init__(
             self,
-            loggers: list[Logger, ...] | tuple[Logger, ...],
             logs_dir: str,
+            loggers: list[Logger, ...] | tuple[Logger, ...],
             format: str = '{levelname} {asctime}: {message}',
             datefmt: str = '%d-%m %H:%M:%S'
     ):
@@ -62,7 +60,7 @@ class LoggingBuilder:
 
         # Определяем хендлер для консоли
         LOGGING['handlers']['console'] = {
-            'level': 'DEBUG' if settings.DEBUG else 'INFO',
+            'level': 'DEBUG',
             'class': 'logging.StreamHandler',
             'formatter': 'base_formatter',
         }

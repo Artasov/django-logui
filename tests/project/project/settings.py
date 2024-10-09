@@ -39,6 +39,7 @@ LOGUI_CONTROLLERS_SETTINGS = {
     'not_auth_redirect': f'/admin/login/?next=/{LOGUI_URL_PREFIX}'
 }
 LOGGING = LoggingBuilder(
+    logs_dir=LOGUI_LOGS_DIR,
     format='{levelname} {asctime}: {message}',
     datefmt='%d-%m %H:%M:%S',
     loggers=(
