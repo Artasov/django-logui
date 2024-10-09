@@ -26,11 +26,11 @@ class LoggingBuilder:
     def __init__(
             self,
             loggers: list[Logger, ...] | tuple[Logger, ...],
-            logs_dir: str = None,
+            logs_dir: str,
             format: str = '{levelname} {asctime}: {message}',
             datefmt: str = '%d-%m %H:%M:%S'
     ):
-        self.logs_dir = logs_dir if logs_dir else settings.LOGUI_LOGS_DIR
+        self.logs_dir = logs_dir
         self.format = format
         self.datefmt = datefmt
         self.loggers = loggers
