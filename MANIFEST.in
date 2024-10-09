@@ -1,4 +1,4 @@
 include LICENSE
 include README.md
-recursive-include endpoints/templates *
-recursive-include endpoints/static *
+recursive-include logui/templates *
+recursive-include logui/static *
