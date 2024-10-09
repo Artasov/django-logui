@@ -43,7 +43,7 @@ def log_file_view(request, folder_name, file_name):
     file_path = os.path.join(settings.LOGUI_LOGS_DIR, folder_name, file_name)
     if not os.path.exists(file_path): raise Http404("Log file not found")
     try:
-        with open(file_path, 'r') as file:
+        with open(file_path, 'r', encoding='utf-8') as file:
             log_content = file.read()
     except Exception as e:
         raise Http404(f"Error reading log file: {str(e)}")
@@ -59,7 +59,7 @@ def api_log_file_view(request, folder_name, file_name):
     file_path = os.path.join(settings.LOGUI_LOGS_DIR, folder_name, file_name)
     if not os.path.exists(file_path): return JsonResponse({'error': 'Log file not found'}, status=404)
     try:
-        with open(file_path, 'r') as file:
+        with open(file_path, 'r', encoding='utf-8') as file:
             log_content = file.read()
         return JsonResponse({'log_content': log_content})
     except Exception as e:
