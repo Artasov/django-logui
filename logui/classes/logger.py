@@ -35,7 +35,7 @@ class LoggingBuilder:
 
     @staticmethod
     def check_loggers(LOGGING: dict) -> None:
-        if True if os.environ.get('RUN_MAIN') != 'true' else False:
+        if os.environ.get('RUN_MAIN') != 'true':
             for logger_name in LOGGING['loggers']:
                 log = logging.getLogger(logger_name)
                 log.warning(f'Logger found: {logger_name}')
@@ -55,23 +55,25 @@ class LoggingBuilder:
             'loggers': {}
         }
 
-        # Создание папки для логов
+        # Create logs directory
         os.makedirs(self.logs_dir, exist_ok=True)
-
-        # Определяем хендлер для консоли
         LOGGING['handlers']['console'] = {
             'level': 'DEBUG',
             'class': 'logging.StreamHandler',
             'formatter': 'base_formatter',
         }
 
-        # Добавление логгеров
+        # Mapping from logger name to its file handler name
+        logger_name_to_file_handler_name = {}
+
+        # First, create file handlers for each logger
         for logger in self.loggers:
             logger_name = logger.name
             log_dir = os.path.join(self.logs_dir, logger_name)
             os.makedirs(log_dir, exist_ok=True)
 
             log_file_handler_name = f'{logger_name}_file'
+            logger_name_to_file_handler_name[logger_name] = log_file_handler_name
             LOGGING['handlers'][log_file_handler_name] = {
                 'level': logger.level,
                 'class': 'logging.handlers.TimedRotatingFileHandler',
@@ -83,20 +85,58 @@ class LoggingBuilder:
                 'delay': True,
             }
 
+            # Initialize logger configuration
             LOGGING['loggers'][logger_name] = {
-                'handlers': ['console', log_file_handler_name],
+                'handlers': [],  # We'll fill this in the next loop
                 'level': logger.level,
                 'propagate': logger.propagate,
             }
 
-            # Добавление логгера в другие логгеры
+        # Create global_file handler if not already created
+        if 'global_file' not in LOGGING['handlers']:
+            global_log_dir = os.path.join(self.logs_dir, 'global')
+            os.makedirs(global_log_dir, exist_ok=True)
+            LOGGING['handlers']['global_file'] = {
+                'level': 'DEBUG',
+                'class': 'logging.handlers.TimedRotatingFileHandler',
+                'filename': os.path.join(global_log_dir, 'global.log'),
+                'when': 'midnight',
+                'backupCount': 360,
+                'formatter': 'base_formatter',
+                'encoding': 'utf-8',
+                'delay': True,
+            }
+            # Ensure the global logger has its own handler and console
+            LOGGING['loggers']['global'] = {
+                'handlers': [
+                    'console',
+                    'global_file'
+                ],
+                'level': 'DEBUG',
+                'propagate': False,
+            }
+
+        # Now, assign handlers to each logger
+        for logger in self.loggers:
+            logger_name = logger.name
+            handler_names = ['console', logger_name_to_file_handler_name[logger_name]]
+
+            # Add global_file handler to all loggers except 'global' itself
+            if logger_name != 'global':
+                handler_names.append('global_file')
+
+            # Add file handlers from include_in loggers
             for include_logger in logger.include_in:
-                if include_logger not in LOGGING['loggers']:
-                    LOGGING['loggers'][include_logger] = {
-                        'handlers': ['console'],
-                        'level': 'DEBUG',
-                        'propagate': False,
-                    }
-                LOGGING['loggers'][include_logger]['handlers'].append(log_file_handler_name)
+                if include_logger in logger_name_to_file_handler_name:
+                    include_handler_name = logger_name_to_file_handler_name[include_logger]
+                    handler_names.append(include_handler_name)
+                else:
+                    # Handle the case where the included logger is not defined
+                    raise ValueError(f"Included logger '{include_logger}' for logger '{logger_name}' is not defined.")
+
+            # Remove duplicates
+            handler_names = list(set(handler_names))
+
+            LOGGING['loggers'][logger_name]['handlers'] = handler_names
 
         return LOGGING

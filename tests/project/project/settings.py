@@ -1,6 +1,8 @@
 from os.path import join
 from pathlib import Path
 
+from adjango.utils.common import is_celery
+
 from logui.classes.logger import LoggingBuilder, Logger
 
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -38,26 +40,26 @@ LOGUI_CONTROLLERS_SETTINGS = {
     'log_name': False,
     'not_auth_redirect': f'/admin/login/?next=/{LOGUI_URL_PREFIX}'
 }
+IS_CELERY = is_celery()
 LOGGING = LoggingBuilder(
     logs_dir=LOGUI_LOGS_DIR,
     format='{levelname} {asctime}: {message}',
     datefmt='%d-%m %H:%M:%S',
     loggers=(
-        Logger(name='tbank', level='DEBUG', include_in=['commerce']),
-        Logger(name='order', level='DEBUG', include_in=[]),
-        Logger(name='email', level='DEBUG', include_in=[]),
-        Logger(name='social_auth', level='DEBUG', include_in=[]),
-        Logger(name='consultation', level='DEBUG', include_in=[]),
-        Logger(name='commerce', level='DEBUG', include_in=['tbank']),
-        Logger(name='global', level='DEBUG', include_in=[
-            'tbank',
-            'order',
-            'email',
-            'social_auth',
-            'consultation'
-            'commerce'
-        ]),
-    )
+        Logger(name='tbank', include_in=['commerce', 'global']),
+        Logger(name='prodamus', include_in=['commerce', 'global']),
+        Logger(name='cloudpayments', include_in=['commerce', 'global']),
+        Logger(name='bitrix', include_in=['global']),
+        Logger(name='shopozz', include_in=['global']),
+        Logger(name='email', include_in=['notify', 'global']),
+        Logger(name='sms', include_in=['notify', 'global']),
+        Logger(name='notify', include_in=['global']),
+        Logger(name='conference', include_in=['global']),
+        Logger(name='commerce', include_in=['global']),
+        Logger(name='lhv2tbank', include_in=['global']),
+        Logger(name='celery', level='INFO', include_in=['global']),
+        Logger(name='global'),
+    ) if not IS_CELERY else (Logger(name='cworker'),)
 ).build()
 LoggingBuilder.check_loggers(LOGGING)
 
