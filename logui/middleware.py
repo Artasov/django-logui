@@ -11,12 +11,14 @@ class RequestResponseLoggerMiddleware(MiddlewareMixin):
         super().__init__(get_response)
         self.get_response = get_response
 
-    def process_request(self, request):
+    @staticmethod
+    def process_request(request):
         if settings.LOGUI_URL_PREFIX not in request.path:
             log.info(f'{request.method} {request.path} {request.ip}')
         return None
 
-    def process_response(self, request, response):
+    @staticmethod
+    def process_response(request, response):
         if settings.LOGUI_URL_PREFIX not in request.path:
             log.info(f'Response {request.path}: {response.status_code}')
         return response

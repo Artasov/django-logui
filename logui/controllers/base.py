@@ -1,6 +1,6 @@
 import os
 
-from adjango.utils.base import controller
+from adjango.decorators import controller
 from django.conf import settings
 from django.http import FileResponse
 from django.http import JsonResponse, Http404
@@ -29,7 +29,7 @@ def log_folders_view(request):
 
 @controller(**ctrl_settings)
 def log_files_view(request, folder_name):
-    folder_path = os.path.join(settings.LOGUI_LOGS_DIR, folder_name)
+    folder_path = str(os.path.join(settings.LOGUI_LOGS_DIR, folder_name))
     if not os.path.exists(folder_path) or not os.path.isdir(folder_path): raise Http404("Folder not found")
     try:
         files = [f for f in os.listdir(folder_path) if os.path.isfile(os.path.join(folder_path, f))]
