@@ -5,7 +5,7 @@ with open("README.md", "r", encoding="utf-8") as fh:
 
 setuptools.setup(
     name="django-logui",
-    version="0.0.7",
+    version="0.0.8",
     author="xlartas",
     author_email="ivanhvalevskey@gmail.com",
     description="Flexible, fast and productive logging for Django with UI",
@@ -16,7 +16,7 @@ setuptools.setup(
     include_package_data=True,
     install_requires=[
         "Django>=4.0,<5.3",
-        "adjango>=0.0.3",
+        "adjango>=0.1.0",
     ],
     classifiers=[
         "Framework :: Django",
