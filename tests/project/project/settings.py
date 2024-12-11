@@ -3,7 +3,7 @@ from pathlib import Path
 
 from adjango.utils.common import is_celery
 
-from logui.classes.logger import LoggingBuilder, Logger
+from logui.utils import check_loggers
 
 BASE_DIR = Path(__file__).resolve().parent.parent
 SECRET_KEY = 'django-insecure-@!c2^-9o^q#&te$c(u(k$l$cm^17p6p9e7cp1v8hnkdzg)a4^w'
@@ -23,45 +23,151 @@ INSTALLED_APPS = [
 
 # adjango settings
 LOGIN_URL = '/login/'
-ADJANGO_BACKENDS_APPS = BASE_DIR / 'apps'
-ADJANGO_FRONTEND_APPS = BASE_DIR.parent / 'frontend' / 'src' / 'apps'
-ADJANGO_APPS_PREPATH = 'apps.'
-ADJANGO_EXCEPTION_REPORT_EMAIL = ('ivanhvalevskey@gmail.com',)
-ADJANGO_EXCEPTION_REPORT_TEMPLATE = 'core/error_report.html'
-ADJANGO_LOGGER_NAME = 'global'
-ADJANGO_EMAIL_LOGGER_NAME = 'email'
 
 # logui settings
-LOGUI_LOGS_DIR = join(BASE_DIR, 'logs')
+LOGS_DIR = join(BASE_DIR, 'logs')
 LOGUI_REQUEST_RESPONSE_LOGGER_NAME = 'global'
-LOGUI_URL_PREFIX = 'logui/'
-LOGUI_CONTROLLERS_SETTINGS = {
-    'auth_required': True,
-    'log_name': False,
-    'not_auth_redirect': f'/admin/login/?next=/{LOGUI_URL_PREFIX}'
+LOGGING = {
+    'version': 1,
+    'disable_existing_loggers': False,
+    'formatters': {
+        'simple': {
+            'format': '{levelname} {asctime}: {message}',
+            'datefmt': '%d-%m %H:%M:%S',
+            'style': '{',
+        },
+        'request': {
+            'format': '{levelname} {asctime}: {message} - {method} {url} {status}',
+            'style': '{',
+        },
+    },
+    'handlers': {
+        'daily_file': {
+            'level': 'DEBUG',
+            'class': 'logging.handlers.TimedRotatingFileHandler',
+            'filename': join(LOGS_DIR, 'django.log'),
+            'when': 'midnight',  # Ротация происходит в полночь
+            'interval': 1,  # Интервал ротации — 1 день
+            'backupCount': 356,  # Хранить логи за последний год
+            'formatter': 'simple',
+            'encoding': 'utf8',
+        },
+        'console': {
+            'level': 'DEBUG',
+            'class': 'logging.StreamHandler',
+            'formatter': 'simple',
+        },
+    },
+    'loggers': {
+        # 'django.request': {
+        #     'handlers': ['daily_file', 'console'],
+        #     'level': 'DEBUG',
+        #     'formatter': 'request',  # Используем кастомный формат для запросов
+        #     'propagate': False,
+        # },
+        'tbank': {
+            'handlers': ['daily_file', 'console'],
+            'level': 'DEBUG',
+            'propagate': False,
+        },
+        'stripe': {
+            'handlers': ['daily_file', 'console'],
+            'level': 'DEBUG',
+            'propagate': False,
+        },
+        'prodamus': {
+            'handlers': ['daily_file', 'console'],
+            'level': 'DEBUG',
+            'propagate': False,
+        },
+        'cloudpayments': {
+            'handlers': ['daily_file', 'console'],
+            'level': 'DEBUG',
+            'propagate': False,
+        },
+        'bitrix': {
+            'handlers': ['daily_file', 'console'],
+            'level': 'DEBUG',
+            'propagate': False,
+        },
+        'shopozz': {
+            'handlers': ['daily_file', 'console'],
+            'level': 'DEBUG',
+            'propagate': False,
+        },
+        'order': {
+            'handlers': ['daily_file', 'console'],
+            'level': 'DEBUG',
+            'propagate': False,
+        },
+        'conference': {
+            'handlers': ['daily_file', 'console'],
+            'level': 'DEBUG',
+            'propagate': False,
+        },
+        'sms': {
+            'handlers': ['daily_file', 'console'],
+            'level': 'DEBUG',
+            'propagate': False,
+        },
+        'email': {
+            'handlers': ['daily_file', 'console'],
+            'level': 'DEBUG',
+            'propagate': False,
+        },
+        'notify': {
+            'handlers': ['daily_file', 'console'],
+            'level': 'DEBUG',
+            'propagate': False,
+        },
+        'confirmation': {
+            'handlers': ['daily_file', 'console'],
+            'level': 'DEBUG',
+            'propagate': False,
+        },
+        'celery-worker': {
+            'handlers': ['daily_file', 'console'],
+            'level': 'DEBUG',
+            'propagate': False,
+        },
+        'social_auth': {
+            'handlers': ['daily_file', 'console'],
+            'level': 'DEBUG',
+            'propagate': False,
+        },
+        'consultation': {
+            'handlers': ['daily_file', 'console'],
+            'level': 'DEBUG',
+            'propagate': False,
+        },
+        'commerce': {
+            'handlers': ['daily_file', 'console'],
+            'level': 'DEBUG',
+            'propagate': False,
+        },
+        'reports': {
+            'handlers': ['daily_file', 'console'],
+            'level': 'DEBUG',
+            'propagate': False,
+        },
+        'global': {
+            'handlers': ['daily_file', 'console'],
+            'level': 'DEBUG',
+            'propagate': False,
+        },
+        # # Если используете другие логгеры для запросов, например, 'django.server', добавьте их сюда
+        # 'django.server': {
+        #     'handlers': [],
+        #     'level': 'CRITICAL',
+        #     'propagate': False,
+        # },
+    },
+    # 'root': {  # Корневой логгер (опционально)
+    #     'handlers': ['daily_file', 'console'],
+    #     'level': 'INFO',
+    # },
 }
-IS_CELERY = is_celery()
-LOGGING = LoggingBuilder(
-    logs_dir=LOGUI_LOGS_DIR,
-    format='{levelname} {asctime}: {message}',
-    datefmt='%d-%m %H:%M:%S',
-    loggers=(
-        Logger(name='tbank', include_in=['commerce', 'global']),
-        Logger(name='prodamus', include_in=['commerce', 'global']),
-        Logger(name='cloudpayments', include_in=['commerce', 'global']),
-        Logger(name='bitrix', include_in=['global']),
-        Logger(name='shopozz', include_in=['global']),
-        Logger(name='email', include_in=['notify', 'global']),
-        Logger(name='sms', include_in=['notify', 'global']),
-        Logger(name='notify', include_in=['global']),
-        Logger(name='conference', include_in=['global']),
-        Logger(name='commerce', include_in=['global']),
-        Logger(name='lhv2tbank', include_in=['global']),
-        Logger(name='celery', level='INFO', include_in=['global']),
-        Logger(name='global'),
-    ) if not IS_CELERY else (Logger(name='cworker'),)
-).build()
-LoggingBuilder.check_loggers(LOGGING)
+check_loggers(LOGGING)
 
 MIDDLEWARE = [
     'adjango.middleware.IPAddressMiddleware',  # first IP middleware from adjango
