@@ -8,10 +8,10 @@ setuptools.setup(
     version="0.1.0",
     author="xlartas",
     author_email="ivanhvalevskey@gmail.com",
-    description="Flexible, fast and productive logging for Django with UI",
+    description="Flexible, fast and productive UI for logging in Django",
     long_description=long_description,
     long_description_content_type="text/markdown",
-    url="https://github.com/Artasov/adjango",
+    url="https://github.com/Artasov/django-logui",
     packages=setuptools.find_packages(),
     include_package_data=True,
     install_requires=[
