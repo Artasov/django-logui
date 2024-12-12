@@ -33,7 +33,7 @@ def log_folders_view(request):
         path = os.path.join(LOGS_DIR, f)
         if os.path.isdir(path):
             folders.append(f)
-        elif os.path.isfile(path) and f.endswith('.log'):
+        elif os.path.isfile(path) and '.log' in f:
             # Это лог-файл в корневой директории
             root_files.append(f)
 
